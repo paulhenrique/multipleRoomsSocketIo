@@ -14,35 +14,39 @@
 </head>
 
 <body>
-  <form action="" id="chat">
-    <input input type="text" name="username" placeholder="Digite seu usuário" />
+  <form id="chat">
+    <input type="text" name="username" placeholder="Digite seu usuário" />
     <div class="messages"></div>
-    <input input type="text" name="message" placeholder="Digite sua mensagem" />
-    <button type="submit">Enviar</button>
+    <input type="text" name="message" placeholder="Digite sua mensagem" />
+    <input type="text" id="inputRoom" value="sala1" name="room" placeholder="Digite a sala" />
+    <button id="sendMessage" type="submit">Enviar</button>
   </form>
+
   <script type="text/javascript">
     var socket = io('http://localhost:3000');
+    var room = $('#inputRoom').val();
 
     function renderMessage(message) {
       $('.messages').append('<div class="message"><strong>' + message.author + '</strong>:' + message.message + '</div>')
     }
-
+    socket.emit('join', room);
     socket.on('recivedMessage', renderMessage);
     socket.on('previousMessages', messages => {
       messages.map(message => renderMessage(message));
     });
 
-    $("#chat").submit(function (event) {
+    $("#sendMessage").on('click', function (event) {
       event.preventDefault();
 
       var author = $('input[name=username]').val();
       var message = $('input[name=message]').val();
-
+      var room = $('#inputRoom').val();
 
       if (author.length && message.length) {
         var messageObject = {
           author,
-          message
+          message,
+          room
         };
       }
 
